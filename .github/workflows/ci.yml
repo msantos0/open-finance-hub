@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - feature/**
 
   pull_request:
     branches:
@@ -25,6 +26,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+
+      - name: Grant execute permission
+        run: chmod +x mvnw
 
       - name: Build
         run: ./mvnw clean verify
