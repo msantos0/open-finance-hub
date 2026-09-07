@@ -22,6 +22,13 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.NOT_FOUND, exception.getMessage(), request.getRequestURI(), Map.of());
     }
 
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<ApiError> handleAccountNotFound(
+            AccountNotFoundException exception,
+            HttpServletRequest request) {
+        return buildError(HttpStatus.NOT_FOUND, exception.getMessage(), request.getRequestURI(), Map.of());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(
             MethodArgumentNotValidException exception,
