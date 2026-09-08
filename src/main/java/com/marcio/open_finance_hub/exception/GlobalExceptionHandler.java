@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -45,6 +46,13 @@ public class GlobalExceptionHandler {
                 .forEach(error -> validationErrors.put(error.getField(), error.getDefaultMessage()));
 
         return buildError(HttpStatus.BAD_REQUEST, "Request validation failed", request.getRequestURI(), validationErrors);
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class, MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<ApiError> handleBadRequest(
+            Exception exception,
+            HttpServletRequest request) {
+        return buildError(HttpStatus.BAD_REQUEST, exception.getMessage(), request.getRequestURI(), Map.of());
     }
 
     private ResponseEntity<ApiError> buildError(
