@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class DashboardService {
 
     private final TransactionRepository transactionRepository;
+    private final CurrentUserService currentUserService;
 
     public DashboardSummaryResponseDTO getSummary() {
         return getSummary(null, null);
@@ -35,7 +36,7 @@ public class DashboardService {
             endDate = period.atEndOfMonth();
         }
 
-        for (var transaction : transactionRepository.findAll()) {
+        for (var transaction : transactionRepository.findByUserId(currentUserService.get().getId())) {
             if (startDate != null && (transaction.getTransactionDate().isBefore(startDate)
                     || transaction.getTransactionDate().isAfter(endDate))) {
                 continue;

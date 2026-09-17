@@ -26,6 +26,7 @@ public class Transaction {
     @Id
     private String id;
 
+    private String userId;
     private String description;
     private BigDecimal amount;
     private TransactionType transactionType;
