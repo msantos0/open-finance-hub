@@ -27,8 +27,9 @@ public class TransactionService {
     private final CurrentUserService currentUserService;
 
     public TransactionResponseDTO create(TransactionRequestDTO request) {
-        validateReferences(request.categoryId(), request.accountId());
         String userId = currentUserService.get().getId();
+        validateReferences(request.categoryId(), request.accountId(), userId);
+
         Instant now = Instant.now();
         Transaction transaction = Transaction.builder()
                 .userId(userId)
@@ -46,7 +47,9 @@ public class TransactionService {
     }
 
     public List<TransactionResponseDTO> findAll() {
-        return transactionRepository.findByUserId(currentUserService.get().getId()).stream().map(this::toResponse).toList();
+        return transactionRepository.findByUserId(currentUserService.get().getId()).stream()
+            .map(this::toResponse)
+            .toList();
     }
 
     public TransactionResponseDTO findById(String id) {
@@ -55,7 +58,7 @@ public class TransactionService {
 
     public TransactionResponseDTO update(String id, TransactionRequestDTO request) {
         Transaction transaction = findTransaction(id);
-        validateReferences(request.categoryId(), request.accountId());
+        validateReferences(request.categoryId(), request.accountId(), transaction.getUserId());
         transaction.setDescription(request.description().trim());
         transaction.setAmount(request.amount());
         transaction.setTransactionType(request.transactionType());
@@ -77,8 +80,7 @@ public class TransactionService {
                 .orElseThrow(() -> new TransactionNotFoundException(id));
     }
 
-    private void validateReferences(String categoryId, String accountId) {
-        String userId = currentUserService.get().getId();
+    private void validateReferences(String categoryId, String accountId, String userId) {
         if (!categoryRepository.existsByIdAndUserId(categoryId.trim(), userId)) {
             throw new CategoryNotFoundException(categoryId);
         }
