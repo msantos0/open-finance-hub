@@ -24,11 +24,14 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
     private final AccountRepository accountRepository;
+    private final CurrentUserService currentUserService;
 
     public TransactionResponseDTO create(TransactionRequestDTO request) {
         validateReferences(request.categoryId(), request.accountId());
+        String userId = currentUserService.get().getId();
         Instant now = Instant.now();
         Transaction transaction = Transaction.builder()
+                .userId(userId)
                 .description(request.description().trim())
                 .amount(request.amount())
                 .transactionType(request.transactionType())
@@ -43,7 +46,7 @@ public class TransactionService {
     }
 
     public List<TransactionResponseDTO> findAll() {
-        return transactionRepository.findAll().stream().map(this::toResponse).toList();
+        return transactionRepository.findByUserId(currentUserService.get().getId()).stream().map(this::toResponse).toList();
     }
 
     public TransactionResponseDTO findById(String id) {
@@ -70,15 +73,16 @@ public class TransactionService {
     }
 
     private Transaction findTransaction(String id) {
-        return transactionRepository.findById(id)
+        return transactionRepository.findByIdAndUserId(id, currentUserService.get().getId())
                 .orElseThrow(() -> new TransactionNotFoundException(id));
     }
 
     private void validateReferences(String categoryId, String accountId) {
-        if (!categoryRepository.existsById(categoryId.trim())) {
+        String userId = currentUserService.get().getId();
+        if (!categoryRepository.existsByIdAndUserId(categoryId.trim(), userId)) {
             throw new CategoryNotFoundException(categoryId);
         }
-        if (!accountRepository.existsById(accountId.trim())) {
+        if (!accountRepository.existsByIdAndUserId(accountId.trim(), userId)) {
             throw new AccountNotFoundException(accountId);
         }
     }

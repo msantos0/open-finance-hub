@@ -18,10 +18,13 @@ import lombok.RequiredArgsConstructor;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final CurrentUserService currentUserService;
 
     public AccountResponseDTO create(AccountRequestDTO request) {
+        String userId = currentUserService.get().getId();
         Instant now = Instant.now();
         Account account = Account.builder()
+                .userId(userId)
                 .name(request.name().trim())
                 .bank(request.bank().trim())
                 .accountType(request.accountType())
@@ -36,11 +39,13 @@ public class AccountService {
     }
 
     public List<AccountResponseDTO> findAll() {
-        return accountRepository.findAll().stream().map(this::toResponse).toList();
+        return accountRepository.findByUserId(currentUserService.get().getId()).stream().map(this::toResponse).toList();
     }
 
     public List<AccountResponseDTO> findActive() {
-        return accountRepository.findByActiveTrue().stream().map(this::toResponse).toList();
+        return accountRepository.findByUserIdAndActiveTrue(currentUserService.get().getId()).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public AccountResponseDTO findById(String id) {
@@ -65,7 +70,7 @@ public class AccountService {
     }
 
     private Account findAccount(String id) {
-        return accountRepository.findById(id)
+        return accountRepository.findByIdAndUserId(id, currentUserService.get().getId())
                 .orElseThrow(() -> new AccountNotFoundException(id));
     }
 

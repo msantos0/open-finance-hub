@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.marcio.open_finance_hub.dto.CategoryExpenseResponseDTO;
 import com.marcio.open_finance_hub.dto.DashboardSummaryResponseDTO;
+import com.marcio.open_finance_hub.dto.MonthlyEvolutionResponseDTO;
+import com.marcio.open_finance_hub.dto.TransactionResponseDTO;
 import com.marcio.open_finance_hub.service.DashboardService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,5 +50,23 @@ public class DashboardController {
         }
 
         return ResponseEntity.ok(dashboardService.getSummary(month, year));
+    }
+
+    @GetMapping("/category-expenses")
+    @Operation(summary = "Get expenses grouped by category")
+    public ResponseEntity<List<CategoryExpenseResponseDTO>> getCategoryExpenses() {
+        return ResponseEntity.ok(dashboardService.getCategoryExpenses());
+    }
+
+    @GetMapping("/monthly-evolution")
+    @Operation(summary = "Get income and expenses for the last 12 months")
+    public ResponseEntity<List<MonthlyEvolutionResponseDTO>> getMonthlyEvolution() {
+        return ResponseEntity.ok(dashboardService.getMonthlyEvolution());
+    }
+
+    @GetMapping("/recent-transactions")
+    @Operation(summary = "Get the 10 most recent transactions")
+    public ResponseEntity<List<TransactionResponseDTO>> getRecentTransactions() {
+        return ResponseEntity.ok(dashboardService.getRecentTransactions());
     }
 }

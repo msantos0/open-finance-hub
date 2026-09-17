@@ -18,10 +18,13 @@ import lombok.RequiredArgsConstructor;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CurrentUserService currentUserService;
 
     public CategoryResponse create(CategoryRequest request) {
+        String userId = currentUserService.get().getId();
         Instant now = Instant.now();
         Category category = Category.builder()
+                .userId(userId)
                 .name(request.name().trim())
                 .description(normalizeDescription(request.description()))
                 .type(request.type())
@@ -33,7 +36,7 @@ public class CategoryService {
     }
 
     public List<CategoryResponse> findAll() {
-        return categoryRepository.findAll().stream().map(this::toResponse).toList();
+        return categoryRepository.findByUserId(currentUserService.get().getId()).stream().map(this::toResponse).toList();
     }
 
     public CategoryResponse findById(String id) {
@@ -56,7 +59,7 @@ public class CategoryService {
     }
 
     private Category findCategory(String id) {
-        return categoryRepository.findById(id)
+        return categoryRepository.findByIdAndUserId(id, currentUserService.get().getId())
                 .orElseThrow(() -> new CategoryNotFoundException(id));
     }
 
