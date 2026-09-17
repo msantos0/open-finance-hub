@@ -25,6 +25,7 @@ public class Account {
     @Id
     private String id;
 
+    private String userId;
     private String name;
     private String bank;
     private AccountType accountType;
