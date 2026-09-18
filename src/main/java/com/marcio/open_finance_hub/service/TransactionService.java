@@ -29,6 +29,7 @@ public class TransactionService {
     public TransactionResponseDTO create(TransactionRequestDTO request) {
         String userId = currentUserService.get().getId();
         validateReferences(request.categoryId(), request.accountId(), userId);
+
         Instant now = Instant.now();
         Transaction transaction = Transaction.builder()
                 .userId(userId)

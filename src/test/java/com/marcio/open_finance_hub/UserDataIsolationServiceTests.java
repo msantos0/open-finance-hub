@@ -113,7 +113,7 @@ class UserDataIsolationServiceTests {
                 Transaction.builder().userId(USER_ID).amount(BigDecimal.TEN).transactionType(TransactionType.INCOME)
                         .transactionDate(LocalDate.of(2026, 9, 1)).build()));
 
-        DashboardService service = new DashboardService(transactionRepository, currentUserService);
+        DashboardService service = new DashboardService(transactionRepository, categoryRepository, currentUserService);
         var summary = service.getSummary();
 
         assertEquals(BigDecimal.TEN, summary.totalIncome());
