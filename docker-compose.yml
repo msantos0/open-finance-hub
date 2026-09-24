@@ -9,7 +9,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data:/data/db
+      - open_finance_hub_data:/data/db
 
   open-finance-hub:
     build: .
@@ -19,7 +19,11 @@ services:
     ports:
       - "8085:8085"
     environment:
-      MONGODB_URI: mongodb://mongodb:27017/open_finance_hub
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/open_finance_hub
+      JWT_SECRET: open-finance-hub-development-secret-key-please-change
+      JWT_EXPIRATION_MS: 86400000
 
 volumes:
-  mongodb_data:
+  open_finance_hub_data:
+   external: true
+   name: open-finance-hub_open_finance_hub_data
