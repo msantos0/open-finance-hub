@@ -9,7 +9,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data:/data/db
+      - open_finance_hub_data:/data/db
 
   open-finance-hub:
     build: .
@@ -24,4 +24,6 @@ services:
       JWT_EXPIRATION_MS: 86400000
 
 volumes:
-  mongodb_data:
+  open_finance_hub_data:
+   external: true
+   name: open-finance-hub_open_finance_hub_data
